@@ -31,14 +31,14 @@ Flags:
 When adding diffs into markdown, use the following format:
 
 - Specify the code block is a diff with `diff` on the same line as the backticks.
-- Specify the base git reference the diff applies to, either a tag or a commit sha, using the `check.base=` parameter.
+- Specify the base git reference the diff applies to, either a tag or a commit sha, using the `mddiffcheck.base=` parameter.
 
 ````
 # Heading
 
 ## Subheading
 
-```diff check.base=v16.0.0
+```diff mddiffcheck.base=v16.0.0
 diff --git a/src/xdr/Stellar-ledger-entries.x b/src/xdr/Stellar-ledger-entries.x
 index 0e7bc842..68c52758 100644
 --- a/src/xdr/Stellar-ledger-entries.x
