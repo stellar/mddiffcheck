@@ -104,13 +104,13 @@ func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader
 			return fmt.Errorf("parsing params %q: %w", params, err)
 		}
 
-		ignore := paramValues.Get("check.ignore")
+		ignore := paramValues.Get("mddiffcheck.ignore")
 		if ignore == "true" {
-			fmt.Fprintf(stderr, "%s:%d: skipping due to check.ignore=true\n", filename, lineNum)
+			fmt.Fprintf(stderr, "%s:%d: skipping due to mddiffcheck.ignore=true\n", filename, lineNum)
 			return nil
 		}
 
-		base := paramValues.Get("check.base")
+		base := paramValues.Get("mddiffcheck.base")
 		if base == "" {
 			return fmt.Errorf("no base specified for diff")
 		}
