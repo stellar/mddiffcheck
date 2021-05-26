@@ -32,6 +32,7 @@ When adding diffs into markdown, use the following format:
 
 - Specify the code block is a diff with `diff` on the same line as the backticks.
 - Specify the base git reference the diff applies to, either a tag or a commit sha, using the `mddiffcheck.base=` parameter.
+- Or, specify the diff should be ignored and not checked, using the `mddiffcheck.ignore=true` parameter.
 
 ````
 # Heading
