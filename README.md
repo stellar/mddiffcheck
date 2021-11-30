@@ -10,11 +10,11 @@ The tool runs `git` as a subprocess and requires it to be installed.
 ## Usage
 
 ```
-$ go get github.com/stellar/mddiff@latest
+$ go install github.com/stellar/mddiffcheck@latest
 ```
 
 ```
-$ mddiff -help
+$ mddiffcheck -help
 Usage of mddiffcheck:
   mddiffcheck -repo=<repo> <markdown-file> [markdown-file] ...
 
