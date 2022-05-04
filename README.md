@@ -32,6 +32,7 @@ When adding diffs into markdown, use the following format:
 
 - Specify the code block is a diff with `diff` on the same line as the backticks.
 - Specify the base git reference the diff applies to, either a tag or a commit sha, using the `mddiffcheck.base=` parameter.
+- Optionally specify a ref to fetch if the base is not part of the default fetch, such as when referencing a commit in a pull request from a fork, using the `mddiffcheck.fetch=pull/3380/head`.
 - Or, specify the diff should be ignored and not checked, using the `mddiffcheck.ignore=true` parameter.
 
 ````
@@ -39,7 +40,7 @@ When adding diffs into markdown, use the following format:
 
 ## Subheading
 
-```diff mddiffcheck.base=v16.0.0
+```diff mddiffcheck.fetch=pull/3380/head mddiffcheck.base=v16.0.0
 diff --git a/src/xdr/Stellar-ledger-entries.x b/src/xdr/Stellar-ledger-entries.x
 index 0e7bc842..68c52758 100644
 --- a/src/xdr/Stellar-ledger-entries.x
