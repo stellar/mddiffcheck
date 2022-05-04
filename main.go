@@ -110,6 +110,15 @@ func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader
 			return nil
 		}
 
+		fetch := paramValues.Get("mddiffcheck.fetch")
+		if fetch != "" {
+			fmt.Fprintf(stderr, "%s:%d: fetching %s\n", filename, lineNum, fetch)
+			err = gitFetch(workingDir, fetch)
+			if err != nil {
+				return fmt.Errorf("fetching %q: %w", fetch, err)
+			}
+		}
+
 		base := paramValues.Get("mddiffcheck.base")
 		if base == "" {
 			return fmt.Errorf("no base specified for diff")
@@ -190,7 +199,7 @@ func findDiffs(md io.Reader, found findDiffsCallback) error {
 		if fcb.Info == nil {
 			return ast.WalkContinue, nil
 		}
-		info := strings.Split(string(fcb.Info.Text(b)), " ")
+		info := strings.SplitN(string(fcb.Info.Text(b)), " ", 2)
 
 		// Ignore code blocks that aren't diffs
 		if info[0] != "diff" {
@@ -200,7 +209,7 @@ func findDiffs(md io.Reader, found findDiffsCallback) error {
 		// Get the params that appear after the word "diff" in the info.
 		params := ""
 		if len(info) >= 2 {
-			params = info[1]
+			params = strings.ReplaceAll(info[1], " ", "&")
 		}
 
 		// Get the line number the diff starts on.
@@ -228,6 +237,19 @@ func gitClone(dir, repo string) error {
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("cloning %s into %s: %v\n%s", repo, dir, err, strings.TrimSuffix(out.String(), "\n"))
+	}
+	return nil
+}
+
+func gitFetch(dir, ref string) error {
+	cmd := exec.Command("git", "fetch", "--quiet", "origin", ref)
+	out := strings.Builder{}
+	cmd.Stderr = &out
+	cmd.Stdout = &out
+	cmd.Dir = dir
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("fetch out %s: %v\n%s", ref, err, strings.TrimSuffix(out.String(), "\n"))
 	}
 	return nil
 }
