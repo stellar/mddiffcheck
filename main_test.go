@@ -19,7 +19,7 @@ func TestCheckSuccess(t *testing.T) {
 	exitCode, stdout, stderr := h.Main(args, nil, run)
 	assert.Equal(t, 0, exitCode)
 	assert.Equal(t, "", stdout)
-	stderrSimplified := regexp.MustCompile(`/tmp/\d+`).ReplaceAllLiteralString(stderr, "/tmp/out")
+	stderrSimplified := regexp.MustCompile(`/(tmp|var)([/_a-zA-Z0-9]*)/\d+`).ReplaceAllLiteralString(stderr, "/tmp/out")
 	assert.Equal(
 		t,
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
@@ -43,7 +43,7 @@ func TestCheckFail(t *testing.T) {
 	exitCode, stdout, stderr := h.Main(args, nil, run)
 	assert.Equal(t, 1, exitCode)
 	assert.Equal(t, "", stdout)
-	stderrSimplified := regexp.MustCompile(`/tmp/\d+`).ReplaceAllLiteralString(stderr, "/tmp/out")
+	stderrSimplified := regexp.MustCompile(`/(tmp|var)([/_a-zA-Z0-9]*)/\d+`).ReplaceAllLiteralString(stderr, "/tmp/out")
 	assert.Equal(
 		t,
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
