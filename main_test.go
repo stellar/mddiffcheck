@@ -60,7 +60,7 @@ error: one or more diffs failed to apply
 	)
 }
 
-func TestCheckSuccessWithFetch(t *testing.T) {
+func TestCheckSuccessWithOrphanCommit(t *testing.T) {
 	h := testcli.Helper{TB: t}
 
 	markdownPath := filepath.Join("testdata", "cap-0048.md")
@@ -76,7 +76,6 @@ func TestCheckSuccessWithFetch(t *testing.T) {
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
 repo: ok
 testdata/cap-0048.md:79: parsing diff
-testdata/cap-0048.md:79: fetching pull/3380/head
 testdata/cap-0048.md:79: checking out base ref 7fcc8002a595e59fad2c9bedbcf019865fb6b373
 testdata/cap-0048.md:79: checking diff (/tmp/out)...
 testdata/cap-0048.md:79: ok
