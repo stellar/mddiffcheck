@@ -25,6 +25,7 @@ func TestCheckSuccess(t *testing.T) {
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
 repo: ok
 testdata/cap-0039.md:64: parsing diff
+testdata/cap-0039.md:64: fetching b9e10051eafa1125e8d238a47e5915dad30c2640
 testdata/cap-0039.md:64: checking out base ref b9e10051eafa1125e8d238a47e5915dad30c2640
 testdata/cap-0039.md:64: checking diff (/tmp/out)...
 testdata/cap-0039.md:64: ok
@@ -49,6 +50,7 @@ func TestCheckFail(t *testing.T) {
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
 repo: ok
 testdata/cap-0039-fail.md:64: parsing diff
+testdata/cap-0039-fail.md:64: fetching b9e10051eafa1125e8d238a47e5915dad30c2640
 testdata/cap-0039-fail.md:64: checking out base ref b9e10051eafa1125e8d238a47e5915dad30c2640
 testdata/cap-0039-fail.md:64: checking diff (/tmp/out)...
 testdata/cap-0039-fail.md:64: error: git apply: applying /tmp/out into /tmp/out: exit status 1
@@ -77,6 +79,7 @@ func TestCheckSuccessWithOrphanCommitFetch(t *testing.T) {
 repo: ok
 testdata/cap-0048.md:79: parsing diff
 testdata/cap-0048.md:79: fetching pull/3380/head
+testdata/cap-0048.md:79: fetching 7fcc8002a595e59fad2c9bedbcf019865fb6b373
 testdata/cap-0048.md:79: checking out base ref 7fcc8002a595e59fad2c9bedbcf019865fb6b373
 testdata/cap-0048.md:79: checking diff (/tmp/out)...
 testdata/cap-0048.md:79: ok
@@ -101,6 +104,7 @@ func TestCheckSuccessWithOrphanCommitNoFetch(t *testing.T) {
 		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
 repo: ok
 testdata/cap-0048-no-fetch.md:79: parsing diff
+testdata/cap-0048-no-fetch.md:79: fetching 7fcc8002a595e59fad2c9bedbcf019865fb6b373
 testdata/cap-0048-no-fetch.md:79: checking out base ref 7fcc8002a595e59fad2c9bedbcf019865fb6b373
 testdata/cap-0048-no-fetch.md:79: checking diff (/tmp/out)...
 testdata/cap-0048-no-fetch.md:79: ok
