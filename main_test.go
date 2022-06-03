@@ -60,7 +60,7 @@ error: one or more diffs failed to apply
 	)
 }
 
-func TestCheckSuccessWithFetch(t *testing.T) {
+func TestCheckSuccessWithOrphanCommitFetch(t *testing.T) {
 	h := testcli.Helper{TB: t}
 
 	markdownPath := filepath.Join("testdata", "cap-0048.md")
@@ -84,3 +84,28 @@ testdata/cap-0048.md:79: ok
 		stderrSimplified,
 	)
 }
+
+func TestCheckSuccessWithOrphanCommitNoFetch(t *testing.T) {
+	h := testcli.Helper{TB: t}
+
+	markdownPath := filepath.Join("testdata", "cap-0048-no-fetch.md")
+
+	args := []string{"mddiffcheck", "-repo", "https://github.com/stellar/stellar-core", markdownPath}
+
+	exitCode, stdout, stderr := h.Main(args, nil, run)
+	assert.Equal(t, 0, exitCode)
+	assert.Equal(t, "", stdout)
+	stderrSimplified := regexp.MustCompile(`/(tmp|var)([/_a-zA-Z0-9]*)/\d+`).ReplaceAllLiteralString(stderr, "/tmp/out")
+	assert.Equal(
+		t,
+		`repo: cloning https://github.com/stellar/stellar-core into /tmp/out...
+repo: ok
+testdata/cap-0048-no-fetch.md:79: parsing diff
+testdata/cap-0048-no-fetch.md:79: checking out base ref 7fcc8002a595e59fad2c9bedbcf019865fb6b373
+testdata/cap-0048-no-fetch.md:79: checking diff (/tmp/out)...
+testdata/cap-0048-no-fetch.md:79: ok
+`,
+		stderrSimplified,
+	)
+}
+

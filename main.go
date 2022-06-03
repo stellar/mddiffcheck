@@ -110,6 +110,11 @@ func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader
 			return nil
 		}
 
+		base := paramValues.Get("mddiffcheck.base")
+		if base == "" {
+			return fmt.Errorf("no base specified for diff")
+		}
+
 		fetch := paramValues.Get("mddiffcheck.fetch")
 		if fetch != "" {
 			fmt.Fprintf(stderr, "%s:%d: fetching %s\n", filename, lineNum, fetch)
@@ -117,12 +122,14 @@ func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader
 			if err != nil {
 				return fmt.Errorf("fetching %q: %w", fetch, err)
 			}
+		} else {
+			fetch = base
+			err = gitFetch(workingDir, fetch)
+			if err != nil {
+				return fmt.Errorf("fetching %q: %w", fetch, err)
+			}
 		}
 
-		base := paramValues.Get("mddiffcheck.base")
-		if base == "" {
-			return fmt.Errorf("no base specified for diff")
-		}
 		fmt.Fprintf(stderr, "%s:%d: checking out base ref %s\n", filename, lineNum, base)
 		err = gitCheckout(workingDir, base)
 		if err != nil {
