@@ -25,7 +25,7 @@ Flags:
   -help
         print this help
   -repo string
-        repository to verify diffs against
+        repository to verify diffs against, multiple repos specified as space separated
 ```
 
 When adding diffs into markdown, use the following format:
