@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -38,7 +39,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 	}
 
 	flagHelp := flagSet.Bool("help", false, "print this help")
-	flagRepo := flagSet.String("repo", "", "repository to verify diffs against")
+	flagRepo := flagSet.String("repo", "", "repository to verify diffs against, multiple repos specified as space separated")
 	err := flagSet.Parse(args[1:])
 	if err != nil {
 		fmt.Fprintf(stderr, "%v\n", err)
@@ -53,7 +54,9 @@ func run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 
 	mdPaths := posArgs
 
-	err = checkFiles(stderr, *flagRepo, mdPaths)
+	flagRepos := strings.Fields(*flagRepo)
+
+	err = checkFiles(stderr, flagRepos, mdPaths)
 	if err != nil {
 		fmt.Fprintln(stderr, "error:", err)
 		return 1
@@ -62,11 +65,13 @@ func run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 	return 0
 }
 
-func checkFiles(stderr io.Writer, repo string, mdPaths []string) error {
+func checkFiles(stderr io.Writer, repos []string, mdPaths []string) error {
 	workingDir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return fmt.Errorf("making temp dir for repo clone: %w", err)
 	}
+
+	repo := repos[0]
 
 	fmt.Fprintf(stderr, "repo: cloning %s into %s...\n", repo, workingDir)
 	err = gitClone(workingDir, repo)
@@ -83,7 +88,7 @@ func checkFiles(stderr io.Writer, repo string, mdPaths []string) error {
 		}
 		defer mdFile.Close()
 
-		err = checkFile(stderr, workingDir, mdPath, mdFile)
+		err = checkFile(stderr, repos, workingDir, mdPath, mdFile)
 		if err != nil {
 			errored = true
 		}
@@ -95,7 +100,7 @@ func checkFiles(stderr io.Writer, repo string, mdPaths []string) error {
 	return nil
 }
 
-func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader) error {
+func checkFile(stderr io.Writer, repos []string, workingDir, filename string, markdown io.Reader) error {
 	checkDiff := func(lineNum int, params, diff string) error {
 		fmt.Fprintf(stderr, "%s:%d: parsing diff\n", filename, lineNum)
 
@@ -115,10 +120,11 @@ func checkFile(stderr io.Writer, workingDir, filename string, markdown io.Reader
 			return fmt.Errorf("no base specified for diff")
 		}
 		fmt.Fprintf(stderr, "%s:%d: checking out base ref %s\n", filename, lineNum, base)
-		err = gitFetch(workingDir, base)
+		repo, err := gitFetch(workingDir, repos, base)
 		if err != nil {
-			return fmt.Errorf("fetching %q: %w", base, err)
+			return fmt.Errorf("fetching %q:\n%w", base, err)
 		}
+		fmt.Fprintf(stderr, "%s:%d: fetched from %s\n", filename, lineNum, repo)
 		err = gitCheckout(workingDir, base)
 		if err != nil {
 			return fmt.Errorf("checkout out ref %q: %w", base, err)
@@ -236,17 +242,26 @@ func gitClone(dir, repo string) error {
 	return nil
 }
 
-func gitFetch(dir, ref string) error {
-	cmd := exec.Command("git", "fetch", "--quiet", "origin", ref)
-	out := strings.Builder{}
-	cmd.Stderr = &out
-	cmd.Stdout = &out
-	cmd.Dir = dir
-	err := cmd.Run()
-	if err != nil {
-		return fmt.Errorf("fetch out %s: %v\n%s", ref, err, strings.TrimSuffix(out.String(), "\n"))
+func gitFetch(dir string, repos []string, ref string) (string, error) {
+	errAll := error(nil)
+	for _, repo := range repos {
+		cmd := exec.Command("git", "fetch", "--quiet", repo, ref)
+		out := strings.Builder{}
+		cmd.Stderr = &out
+		cmd.Stdout = &out
+		cmd.Dir = dir
+		err := cmd.Run()
+		if err == nil {
+			return repo, nil
+		}
+		if err != nil {
+			errAll = errors.Join(
+				errAll,
+				fmt.Errorf("fetch %s from %s: %v\n%s", ref, repo, err, strings.TrimSuffix(out.String(), "\n")),
+				)
+		}
 	}
-	return nil
+	return "", errAll
 }
 
 func gitCheckout(dir, ref string) error {
