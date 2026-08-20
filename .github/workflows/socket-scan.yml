@@ -54,7 +54,7 @@ jobs:
         run: corepack enable
 
       - name: Install Socket CLI
-        run: npm install -g socket
+        run: npm install -g socket@1.1
 
       - name: Run Socket reachability scan
         env:
